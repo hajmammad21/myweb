@@ -12,16 +12,13 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const validatePhone = (phone) => {
-    // Iranian phone number validation
     const iranPhoneRegex = /^(\+98|0)?9\d{9}$/;
     return iranPhoneRegex.test(phone.replace(/\s/g, ''));
   };
 
   const formatPhone = (value) => {
-    // Remove all non-digits except +
     const cleaned = value.replace(/[^\d+]/g, '');
     
-    // Handle +98 prefix
     if (cleaned.startsWith('+98')) {
       const number = cleaned.slice(3);
       if (number.length >= 10) {
@@ -34,7 +31,6 @@ const Auth = () => {
       return '+98 ' + number;
     }
     
-    // Handle 0 prefix (standard Iranian format)
     if (cleaned.startsWith('0')) {
       if (cleaned.length >= 11) {
         return cleaned.slice(0, 11).replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
@@ -46,7 +42,6 @@ const Auth = () => {
       return cleaned;
     }
     
-    // Handle 9 prefix (without 0)
     if (cleaned.startsWith('9')) {
       const withZero = '0' + cleaned;
       return formatPhone(withZero);
@@ -62,14 +57,12 @@ const Auth = () => {
       const formattedPhone = formatPhone(value);
       setFormData(prev => ({ ...prev, [name]: formattedPhone }));
     } else if (name === 'verificationCode') {
-      // Only allow digits for verification code
       const digitsOnly = value.replace(/\D/g, '').slice(0, 5);
       setFormData(prev => ({ ...prev, [name]: digitsOnly }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -111,15 +104,12 @@ const Auth = () => {
     
     try {
       if (!showVerification) {
-        // Simulate sending verification code
         await new Promise(resolve => setTimeout(resolve, 1500));
         setShowVerification(true);
         setErrors({});
       } else {
-        // Simulate verification and login/signup
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Check if user exists (simulate)
         const userExists = Math.random() > 0.5; // Random for demo
         
         if (userExists) {
@@ -128,7 +118,6 @@ const Auth = () => {
           alert(`${formData.name} عزیز، حساب شما با موفقیت ایجاد شد!`);
         }
         
-        // Reset form
         setFormData({ name: '', phone: '', verificationCode: '' });
         setShowVerification(false);
         setErrors({});
@@ -161,16 +150,13 @@ const Auth = () => {
 
   return (
     <div className="auth-container">
-      {/* Background decorative elements */}
       <div className="background-decoration-1"></div>
       <div className="background-decoration-2"></div>
       <div className="background-decoration-3"></div>
 
       <div className="auth-card">
-        {/* Header decoration */}
         <div className="card-header-decoration"></div>
 
-        {/* Logo/Title */}
         <div className="auth-header">
           <h1 className="auth-title">شرکت حقوقی</h1>
           <p className="auth-subtitle">
@@ -181,11 +167,9 @@ const Auth = () => {
           </p>
         </div>
 
-        {/* Form */}
         <div className="auth-form">
           {!showVerification ? (
             <>
-              {/* Name field */}
               <div className="form-group">
                 <label className="form-label">
                   نام و نام خانوادگی *
@@ -204,7 +188,6 @@ const Auth = () => {
                 )}
               </div>
 
-              {/* Phone field */}
               <div className="form-group">
                 <label className="form-label">
                   شماره تلفن همراه *
@@ -227,7 +210,6 @@ const Auth = () => {
               </div>
             </>
           ) : (
-            /* Verification Code */
             <div className="form-group verification">
               <label className="form-label">
                 کد تایید
@@ -271,7 +253,6 @@ const Auth = () => {
             </div>
           )}
 
-          {/* Submit Button */}
           <button
             type="button"
             onClick={handleSubmit}
@@ -293,7 +274,6 @@ const Auth = () => {
           )}
         </div>
 
-        {/* Footer info */}
         <div className="auth-footer">
           <p className="footer-text">
             {showVerification 

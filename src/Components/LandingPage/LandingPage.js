@@ -1,12 +1,26 @@
+// src/Components/LandingPage/LandingPage.js
 import React from 'react';
+import './LandingPage.css';
+import Hero from './Hero/Hero';
+import Features from './Features/Features';
+import Courses from './Courses/Courses';
+import Testimonials from './Testimonials/Testimonials';
+import CTA from './CTA/CTA';
+import Contact from './Contact/Contact';
+import Footer from './Footer/Footer';
 
-const HomePage = () => {
+const LandingPage = () => {
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>صفحه اصلی</h1>
-      <p>به وب‌سایت شرکت حقوقی خوش آمدید.</p>
+    <div className="landing-page">
+      <Hero />
+      <Features />
+      <Courses />
+      <Testimonials />
+      <CTA />
+      <Contact />
+      <Footer />
     </div>
   );
 };
 
-export default HomePage;
+export default LandingPage;

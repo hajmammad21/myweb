@@ -1,0 +1,38 @@
+/* src/Components/LandingPage/Footer/Footer.css */
+@import url('../LandingPage.css');
+
+.footer {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  color: white;
+  padding: 3rem 0 2rem;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fbbf24;
+  margin-bottom: 0.5rem;
+}
+
+.footer-subtitle {
+  color: #d1d5db;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.footer-divider {
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  margin: 0 auto 2rem;
+  border-radius: 1px;
+}
+
+.footer-copyright {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
