@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
 
@@ -6,7 +6,52 @@ const Header = () => {
   const [activeItem, setActiveItem] = useState('Home');
   const [isTestsDropdownOpen, setIsTestsDropdownOpen] = useState(false);
   const [isLearningDropdownOpen, setIsLearningDropdownOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  // Check for user authentication on component mount and localStorage changes
+  useEffect(() => {
+    const checkUserAuth = () => {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('user');
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    // Initial check
+    checkUserAuth();
+
+    // Listen for storage changes (when user logs in/out in another tab)
+    const handleStorageChange = (e) => {
+      if (e.key === 'user') {
+        checkUserAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also listen for custom events (when user logs in/out in same tab)
+    const handleAuthChange = () => {
+      checkUserAuth();
+    };
+
+    window.addEventListener('authChange', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('authChange', handleAuthChange);
+    };
+  }, []);
 
   const handleNavClick = (item, href) => {
     setActiveItem(item);
@@ -28,6 +73,10 @@ const Header = () => {
     setIsLearningDropdownOpen(isHovering);
   };
 
+  const handleUserHover = (isHovering) => {
+    setIsUserDropdownOpen(isHovering);
+  };
+
   const handleDropdownItemClick = (item) => {
     if (item.includes('تست') || item.includes('آزمون')) {
       setActiveItem('Tests');
@@ -43,6 +92,41 @@ const Header = () => {
     } else {
       console.log(`Navigating to: ${item}`);
     }
+  };
+
+  const handleDashboard = () => {
+    navigate('/dashboard');
+    setIsUserDropdownOpen(false);
+  };
+
+  const handleProfile = () => {
+    navigate('/profile');
+    setIsUserDropdownOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsUserDropdownOpen(false);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('authChange'));
+    
+    // Navigate to home page
+    navigate('/');
+    
+    // Show logout confirmation
+    alert('با موفقیت خارج شدید');
+  };
+
+  const handleAuthClick = () => {
+    navigate('/auth');
+  };
+
+  // Get user's first name for display
+  const getUserDisplayName = () => {
+    if (!user || !user.name) return 'کاربر';
+    return user.name.split(' ')[0];
   };
 
   return (
@@ -190,12 +274,60 @@ const Header = () => {
         </nav>
 
         <div className="auth-section">
-          <button
-            className="auth-btn"
-            onClick={() => navigate('/auth')}
-          >
-            ورود/ثبت نام
-          </button>
+          {user ? (
+            // User is logged in - show user dropdown
+            <div
+              className="nav-item dropdown-container user-dropdown"
+              onMouseEnter={() => handleUserHover(true)}
+              onMouseLeave={() => handleUserHover(false)}
+            >
+              <button className="auth-btn user-btn">
+                خوش آمدید، {getUserDisplayName()}
+                <span className="dropdown-arrow">▼</span>
+              </button>
+
+              <div className={`dropdown-menu user-menu ${isUserDropdownOpen ? 'show' : ''}`}>
+                <a
+                  href="#dashboard"
+                  className="dropdown-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDashboard();
+                  }}
+                >
+                  🏠 داشبورد
+                </a>
+                <a
+                  href="#profile"
+                  className="dropdown-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleProfile();
+                  }}
+                >
+                  👤 پروفایل من
+                </a>
+                <a
+                  href="#logout"
+                  className="dropdown-item logout-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLogout();
+                  }}
+                >
+                  🚪 خروج
+                </a>
+              </div>
+            </div>
+          ) : (
+            // User is not logged in - show login/signup button
+            <button
+              className="auth-btn"
+              onClick={handleAuthClick}
+            >
+              ورود/ثبت نام
+            </button>
+          )}
         </div>
       </div>
     </header>

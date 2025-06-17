@@ -182,6 +182,12 @@ const Auth = () => {
     }
   };
 
+  // Function to trigger authentication state change
+  const triggerAuthChange = () => {
+    // Dispatch custom event to notify Header component
+    window.dispatchEvent(new Event('authChange'));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -209,7 +215,19 @@ const Auth = () => {
         });
 
         // Store user data in localStorage for session management
-        localStorage.setItem('user', JSON.stringify(result.user));
+        // Make sure the structure matches what Header expects
+        const userForStorage = {
+          id: result.user.id,
+          name: result.user.name,
+          phone: result.user.phone,
+          created_at: result.user.created_at,
+          updated_at: result.user.updated_at
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userForStorage));
+        
+        // Trigger auth change event for Header component
+        triggerAuthChange();
         
         // Show success message
         if (result.isNewUser) {
@@ -224,7 +242,7 @@ const Auth = () => {
         setErrors({});
         
         // Navigate to home page
-        navigate('/home'); // Replace '/home' with your actual home route
+        navigate('/');
       }
     } catch (error) {
       console.error('Error:', error);
