@@ -1,4 +1,3 @@
-// src/Components/LandingPage/Courses/Courses.js
 import React from 'react';
 import './Courses.css';
 

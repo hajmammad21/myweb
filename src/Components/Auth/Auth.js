@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { supabase } from '../../supabaseClient'; // Adjust path as needed
+import { useNavigate } from 'react-router-dom'; // For navigation
 import './Auth.css';
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -45,6 +48,22 @@ const Auth = () => {
     if (cleaned.startsWith('9')) {
       const withZero = '0' + cleaned;
       return formatPhone(withZero);
+    }
+    
+    return cleaned;
+  };
+
+  const normalizePhone = (phone) => {
+    // Remove all spaces and formatting
+    const cleaned = phone.replace(/\s/g, '');
+    
+    // Convert to standard format (starting with +98)
+    if (cleaned.startsWith('0')) {
+      return '+98' + cleaned.slice(1);
+    } else if (cleaned.startsWith('9')) {
+      return '+98' + cleaned;
+    } else if (cleaned.startsWith('+98')) {
+      return cleaned;
     }
     
     return cleaned;
@@ -95,6 +114,74 @@ const Auth = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Function to check if user exists in Supabase
+  const checkUserExists = async (phone) => {
+    try {
+      const normalizedPhone = normalizePhone(phone);
+      const { data, error } = await supabase
+        .from('users') // Replace 'users' with your actual table name
+        .select('*')
+        .eq('phone', normalizedPhone)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 is "not found" error, which is expected for new users
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error checking user:', error);
+      return null;
+    }
+  };
+
+  // Function to create or update user in Supabase
+  const saveUserToSupabase = async (userData) => {
+    try {
+      const normalizedPhone = normalizePhone(userData.phone);
+      
+      // First, check if user exists
+      const existingUser = await checkUserExists(userData.phone);
+      
+      if (existingUser) {
+        // Update existing user
+        const { data, error } = await supabase
+          .from('users') // Replace with your table name
+          .update({
+            name: userData.name,
+            updated_at: new Date().toISOString()
+          })
+          .eq('phone', normalizedPhone)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { user: data, isNewUser: false };
+      } else {
+        // Create new user
+        const { data, error } = await supabase
+          .from('users') // Replace with your table name
+          .insert([
+            {
+              name: userData.name,
+              phone: normalizedPhone,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ])
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { user: data, isNewUser: true };
+      }
+    } catch (error) {
+      console.error('Error saving user to Supabase:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -104,27 +191,46 @@ const Auth = () => {
     
     try {
       if (!showVerification) {
+        // Send verification code (simulate)
         await new Promise(resolve => setTimeout(resolve, 1500));
         setShowVerification(true);
         setErrors({});
       } else {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Verify code and save to Supabase
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        const userExists = Math.random() > 0.5; // Random for demo
+        // In a real app, you would verify the code here
+        // For demo purposes, we'll assume the code is always valid
         
-        if (userExists) {
-          alert(`خوش آمدید ${formData.name}! ورود موفقیت‌آمیز بود.`);
-        } else {
+        // Save user to Supabase
+        const result = await saveUserToSupabase({
+          name: formData.name,
+          phone: formData.phone
+        });
+
+        // Store user data in localStorage for session management
+        localStorage.setItem('user', JSON.stringify(result.user));
+        
+        // Show success message
+        if (result.isNewUser) {
           alert(`${formData.name} عزیز، حساب شما با موفقیت ایجاد شد!`);
+        } else {
+          alert(`خوش آمدید ${formData.name}! ورود موفقیت‌آمیز بود.`);
         }
         
+        // Reset form
         setFormData({ name: '', phone: '', verificationCode: '' });
         setShowVerification(false);
         setErrors({});
+        
+        // Navigate to home page
+        navigate('/home'); // Replace '/home' with your actual home route
       }
     } catch (error) {
       console.error('Error:', error);
-      setErrors({ submit: 'خطایی رخ داد. لطفاً دوباره تلاش کنید.' });
+      setErrors({ 
+        submit: error.message || 'خطایی رخ داد. لطفاً دوباره تلاش کنید.' 
+      });
     } finally {
       setIsLoading(false);
     }

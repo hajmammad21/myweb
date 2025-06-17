@@ -9,16 +9,16 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleNavClick = (item, href) => {
-  setActiveItem(item);
-  if (item === 'Home') {
-    navigate('/');
-  } else if (href) {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    setActiveItem(item);
+    if (item === 'Home') {
+      navigate('/');
+    } else if (href) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
-  }
-};
+  };
 
   const handleTestsHover = (isHovering) => {
     setIsTestsDropdownOpen(isHovering);
@@ -36,7 +36,13 @@ const Header = () => {
     }
     setIsTestsDropdownOpen(false);
     setIsLearningDropdownOpen(false);
-    console.log(`Navigating to: ${item}`);
+    
+    // Navigate to TestPage for the first test option
+    if (item === 'تست های دروس') {
+      navigate('/test-page');
+    } else {
+      console.log(`Navigating to: ${item}`);
+    }
   };
 
   return (
