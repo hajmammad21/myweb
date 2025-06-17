@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
 
@@ -54,16 +55,18 @@ const Header = () => {
   }, []);
 
   const handleNavClick = (item, href) => {
-    setActiveItem(item);
-    if (item === 'Home') {
-      navigate('/');
-    } else if (href) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
+  setActiveItem(item);
+  if (item === 'Home') {
+    navigate('/');
+  } else if (item === 'Contact Us') {
+    navigate('/contact');  // Add this line
+  } else if (href) {
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }
+};
 
   const handleTestsHover = (isHovering) => {
     setIsTestsDropdownOpen(isHovering);
@@ -89,9 +92,11 @@ const Header = () => {
     // Navigate to TestPage for the first test option
     if (item === 'تست های دروس') {
       navigate('/test-page');
+    } else if (item === 'آزمون های سال های گذشته') {
+      navigate('/past-exams');
     } else {
-      console.log(`Navigating to: ${item}`);
-    }
+    console.log(`Navigating to: ${item}`);
+}
   };
 
   const handleDashboard = () => {
@@ -116,7 +121,7 @@ const Header = () => {
     navigate('/');
     
     // Show logout confirmation
-    alert('با موفقیت خارج شدید');
+    toast.success('با موفقیت خارج شدید');
   };
 
   const handleAuthClick = () => {
@@ -264,7 +269,7 @@ const Header = () => {
                 className={`nav-link ${activeItem === 'Contact Us' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick('Contact Us', '#contact');
+                  handleNavClick('Contact Us', null);
                 }}
               >
                 تماس با ما

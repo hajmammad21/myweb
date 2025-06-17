@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { supabase } from '../../supabaseClient'; // Adjust path as needed
 import { useNavigate } from 'react-router-dom'; // For navigation
 import './Auth.css';
@@ -231,9 +232,9 @@ const Auth = () => {
         
         // Show success message
         if (result.isNewUser) {
-          alert(`${formData.name} عزیز، حساب شما با موفقیت ایجاد شد!`);
+          toast.success(`${formData.name} عزیز، حساب شما با موفقیت ایجاد شد!`);
         } else {
-          alert(`خوش آمدید ${formData.name}! ورود موفقیت‌آمیز بود.`);
+          toast.success(`خوش آمدید ${formData.name}! ورود موفقیت‌آمیز بود.`);
         }
         
         // Reset form
@@ -258,9 +259,9 @@ const Auth = () => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      alert('کد تایید مجدداً ارسال شد');
+      toast.loading('کد تایید مجدداً ارسال شد');
     } catch (error) {
-      alert('خطا در ارسال کد. لطفاً دوباره تلاش کنید.');
+      toast.error('خطا در ارسال کد. لطفاً دوباره تلاش کنید.');
     } finally {
       setIsLoading(false);
     }
