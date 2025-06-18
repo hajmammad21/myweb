@@ -59,7 +59,7 @@ const Header = () => {
   if (item === 'Home') {
     navigate('/');
   } else if (item === 'Contact Us') {
-    navigate('/contact');  // Add this line
+    navigate('/contact');
   } else if (href) {
     const element = document.querySelector(href);
     if (element) {
@@ -91,12 +91,14 @@ const Header = () => {
     
     // Navigate to TestPage for the first test option
     if (item === 'تست های دروس') {
-      navigate('/test-page');
-    } else if (item === 'آزمون های سال های گذشته') {
-      navigate('/past-exams');
-    } else {
+    navigate('/test-page');
+  } else if (item === 'آزمون های سال های گذشته') {
+    navigate('/past-exams');
+  } else if (item === 'آزمون های آزمایشی') {
+    navigate('/mock-exams'); // Add this line
+  } else {
     console.log(`Navigating to: ${item}`);
-}
+  }
   };
 
   const handleDashboard = () => {
