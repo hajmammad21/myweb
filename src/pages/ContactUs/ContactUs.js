@@ -23,34 +23,39 @@ const ContactUs = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error('لطفاً تمام فیلدهای ضروری را پر کنید');
-      setIsSubmitting(false);
-      return;
-    }
+  if (!formData.name || !formData.email || !formData.message) {
+    toast.error('لطفاً تمام فیلدهای ضروری را پر کنید');
+    setIsSubmitting(false);
+    return;
+  }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error('لطفاً ایمیل معتبری وارد کنید');
-      setIsSubmitting(false);
-      return;
-    }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    toast.error('لطفاً ایمیل معتبری وارد کنید');
+    setIsSubmitting(false);
+    return;
+  }
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Here you would typically send the data to your backend
-      console.log('Form submitted:', formData);
-      
+  try {
+    const response = await fetch('http://localhost:5000/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
       toast.success('پیام شما با موفقیت ارسال شد. در اسرع وقت با شما تماس خواهیم گرفت');
-      
-      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -59,12 +64,16 @@ const ContactUs = () => {
         message: '',
         contactMethod: 'email'
       });
-    } catch (error) {
-      toast.error('خطا در ارسال پیام. لطفاً دوباره تلاش کنید');
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      toast.error(data.error || 'خطا در ارسال پیام');
     }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    toast.error('خطا در ارسال پیام. لطفاً دوباره تلاش کنید');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="contact-page">
