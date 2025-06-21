@@ -8,6 +8,8 @@ import PastExams from './pages/PastExams/PastExams';
 import TestPage from './pages/TestPage/TestPage';
 import ContactUs from './pages/ContactUs/ContactUs';
 import MockExams from './pages/MockExams/MockExams';
+import LessonsPdfs from './pages/LessonsPdfs/LessonsPdfs';
+import SummaryNotes from './pages/SummaryNotes/SummaryNotes';
 
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
         <Route path="/past-exams" element={<PastExams />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/mock-exams" element={<MockExams />} />
+        <Route path="/lessons-pdfs" element={<LessonsPdfs />} />
+        <Route path="/summary-notes" element={<SummaryNotes />} />
       </Routes>
       <Toaster position="top-right" />
     </Router>

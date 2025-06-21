@@ -7,7 +7,6 @@
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
-/* Hero Section */
 .contact-hero {
   position: relative;
   height: 300px;
@@ -89,7 +88,6 @@
   }
 }
 
-/* Main Container */
 .contact-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -103,7 +101,6 @@
   margin-bottom: 4rem;
 }
 
-/* Contact Information */
 .contact-info {
   position: sticky;
   top: 2rem;
@@ -201,7 +198,6 @@
   line-height: 1.5;
 }
 
-/* Social Links */
 .social-links {
   border-top: 2px solid rgba(30, 64, 175, 0.1);
   padding-top: 1.5rem;
@@ -244,7 +240,6 @@
   box-shadow: 0 8px 24px rgba(30, 64, 175, 0.3);
 }
 
-/* Contact Form */
 .contact-form-section {
   animation: fadeInRight 0.8s ease-out;
 }
@@ -466,7 +461,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* FAQ Section */
 .faq-section {
   margin-top: 4rem;
   animation: fadeInUp 0.8s ease-out 0.4s both;
@@ -530,7 +524,6 @@
   margin: 0;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .contact-container {
     max-width: 100%;
@@ -660,7 +653,6 @@
   }
 }
 
-/* Accessibility & Print Styles */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -679,9 +671,8 @@
   .contact-hero {
     background: #1e40af;
     color: white;
-    /* Use both properties for better compatibility */
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact; /* Standard property */
+    print-color-adjust: exact;
   }
   
   .submit-btn,
@@ -697,7 +688,6 @@
   }
 }
 
-/* High contrast mode support */
 @media (prefers-contrast: high) {
   .info-card,
   .form-card,
@@ -716,7 +706,6 @@
   }
 }
 
-/* Focus styles for better accessibility */
 .submit-btn:focus,
 .social-icon:focus,
 .form-group input:focus,
@@ -727,12 +716,10 @@
   outline-offset: 2px;
 }
 
-/* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Selection styles */
 ::selection {
   background: rgba(30, 64, 175, 0.2);
   color: #1e40af;

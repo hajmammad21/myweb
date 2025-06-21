@@ -162,7 +162,7 @@
 
 .section-description {
   font-size: 1.25rem;
-  color: #6b7280;
+  color: black !important;
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;

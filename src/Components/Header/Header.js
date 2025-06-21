@@ -55,18 +55,18 @@ const Header = () => {
   }, []);
 
   const handleNavClick = (item, href) => {
-  setActiveItem(item);
-  if (item === 'Home') {
-    navigate('/');
-  } else if (item === 'Contact Us') {
-    navigate('/contact');
-  } else if (href) {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    setActiveItem(item);
+    if (item === 'Home') {
+      navigate('/');
+    } else if (item === 'Contact Us') {
+      navigate('/contact');
+    } else if (href) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
-  }
-};
+  };
 
   const handleTestsHover = (isHovering) => {
     setIsTestsDropdownOpen(isHovering);
@@ -89,16 +89,20 @@ const Header = () => {
     setIsTestsDropdownOpen(false);
     setIsLearningDropdownOpen(false);
     
-    // Navigate to TestPage for the first test option
+    // Navigate to different pages based on the dropdown item
     if (item === 'تست های دروس') {
-    navigate('/test-page');
-  } else if (item === 'آزمون های سال های گذشته') {
-    navigate('/past-exams');
-  } else if (item === 'آزمون های آزمایشی') {
-    navigate('/mock-exams'); // Add this line
-  } else {
-    console.log(`Navigating to: ${item}`);
-  }
+      navigate('/test-page');
+    } else if (item === 'آزمون های سال های گذشته') {
+      navigate('/past-exams');
+    } else if (item === 'آزمون های آزمایشی') {
+      navigate('/mock-exams');
+    } else if (item === 'تدریسی ها و پی دی اف کتب') {
+      navigate('/lessons-pdfs'); // Add this navigation to LessonsPdfs page
+    } else if (item === 'جزوات جمع بندی') {
+      navigate('/summary-notes'); // Add this for future summary notes page
+    } else {
+      console.log(`Navigating to: ${item}`);
+    }
   };
 
   const handleDashboard = () => {
@@ -237,7 +241,7 @@ const Header = () => {
                     handleDropdownItemClick('تدریسی ها و پی دی اف کتب');
                   }}
                 >
-                  تدریسی ها و پی دی اف کتب
+                  تدریس ها و پی دی اف کتب
                 </a>
                 <a
                   href="#summary-notes"

@@ -68,7 +68,6 @@ const ContactUs = () => {
 
   return (
     <div className="contact-page">
-      {/* Hero Section */}
       <div className="contact-hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
@@ -81,7 +80,6 @@ const ContactUs = () => {
 
       <div className="contact-container">
         <div className="contact-content">
-          {/* Contact Information */}
           <div className="contact-info">
             <div className="info-card">
               <div className="info-header">
@@ -155,7 +153,6 @@ const ContactUs = () => {
             </div>
           </div>
 
-          {/* Contact Form */}
           <div className="contact-form-section">
             <div className="form-card">
               <div className="form-header">
@@ -296,7 +293,6 @@ const ContactUs = () => {
           </div>
         </div>
 
-        {/* FAQ Section */}
         <div className="faq-section">
           <div className="faq-header">
             <h2>سوالات متداول</h2>
