@@ -2,6 +2,106 @@ import React, { useState, useEffect } from 'react';
 import './MockExams.css';
 import toast from 'react-hot-toast';
 
+// Move mockExams outside the component since it's static data
+const mockExams = [
+  {
+    id: 1,
+    title: 'آزمون آزمایشی جامع - سری اول',
+    description: 'آزمون کامل شامل تمامی رشته های حقوقی',
+    questions: 100,
+    duration: 180, // minutes
+    difficulty: 'hard',
+    subject: 'comprehensive',
+    participants: 1250,
+    averageScore: 65,
+    tags: ['جامع', 'پیشرفته', 'کانون وکلا']
+  },
+  {
+    id: 2,
+    title: 'آزمون حقوق مدنی - تست سریع',
+    description: 'تمرکز بر قوانین مدنی و اجرای احکام',
+    questions: 50,
+    duration: 90,
+    difficulty: 'medium',
+    subject: 'civil',
+    participants: 890,
+    averageScore: 72,
+    tags: ['حقوق مدنی', 'متوسط']
+  },
+  {
+    id: 3,
+    title: 'آزمون حقوق جزا - سطح مقدماتی',
+    description: 'مبانی حقوق جزا و قانون مجازات اسلامی',
+    questions: 40,
+    duration: 60,
+    difficulty: 'easy',
+    subject: 'criminal',
+    participants: 1500,
+    averageScore: 78,
+    tags: ['حقوق جزا', 'مبتدی']
+  },
+  {
+    id: 4,
+    title: 'آزمون حقوق تجارت و شرکت ها',
+    description: 'قوانین تجارت، شرکت های تجاری و ورشکستگی',
+    questions: 60,
+    duration: 120,
+    difficulty: 'hard',
+    subject: 'commercial',
+    participants: 650,
+    averageScore: 58,
+    tags: ['حقوق تجارت', 'پیشرفته']
+  },
+  {
+    id: 5,
+    title: 'آزمون حقوق اساسی و اداری',
+    description: 'قانون اساسی و حقوق اداری ایران',
+    questions: 45,
+    duration: 75,
+    difficulty: 'medium',
+    subject: 'constitutional',
+    participants: 980,
+    averageScore: 69,
+    tags: ['حقوق اساسی', 'متوسط']
+  },
+  {
+    id: 6,
+    title: 'آزمون آزمایشی جامع - سری دوم',
+    description: 'آزمون پیشرفته برای آمادگی نهایی',
+    questions: 120,
+    duration: 200,
+    difficulty: 'hard',
+    subject: 'comprehensive',
+    participants: 750,
+    averageScore: 62,
+    tags: ['جامع', 'پیشرفته', 'تخصصی']
+  },
+  {
+    id: 7,
+    title: 'آزمون سریع - مرور کلی',
+    description: 'مرور سریع تمامی مباحث در زمان محدود',
+    questions: 30,
+    duration: 45,
+    difficulty: 'easy',
+    subject: 'comprehensive',
+    participants: 2100,
+    averageScore: 75,
+    tags: ['سریع', 'مرور', 'آسان']
+  },
+  {
+    id: 8,
+    title: 'آزمون حقوق خانواده',
+    description: 'احوال شخصیه، ازدواج، طلاق و ارث',
+    questions: 35,
+    duration: 60,
+    difficulty: 'medium',
+    subject: 'family',
+    participants: 1100,
+    averageScore: 71,
+    tags: ['حقوق خانواده', 'متوسط']
+  }
+];
+
 const MockExams = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [selectedSubject, setSelectedSubject] = useState('all');
@@ -10,105 +110,6 @@ const MockExams = () => {
 
   // Mock user data for testing (remove this in production)
   const [mockUser] = useState({ name: 'کاربر آزمایشی', id: 1 });
-
-  const mockExams = [
-    {
-      id: 1,
-      title: 'آزمون آزمایشی جامع - سری اول',
-      description: 'آزمون کامل شامل تمامی رشته های حقوقی',
-      questions: 100,
-      duration: 180, // minutes
-      difficulty: 'hard',
-      subject: 'comprehensive',
-      participants: 1250,
-      averageScore: 65,
-      tags: ['جامع', 'پیشرفته', 'کانون وکلا']
-    },
-    {
-      id: 2,
-      title: 'آزمون حقوق مدنی - تست سریع',
-      description: 'تمرکز بر قوانین مدنی و اجرای احکام',
-      questions: 50,
-      duration: 90,
-      difficulty: 'medium',
-      subject: 'civil',
-      participants: 890,
-      averageScore: 72,
-      tags: ['حقوق مدنی', 'متوسط']
-    },
-    {
-      id: 3,
-      title: 'آزمون حقوق جزا - سطح مقدماتی',
-      description: 'مبانی حقوق جزا و قانون مجازات اسلامی',
-      questions: 40,
-      duration: 60,
-      difficulty: 'easy',
-      subject: 'criminal',
-      participants: 1500,
-      averageScore: 78,
-      tags: ['حقوق جزا', 'مبتدی']
-    },
-    {
-      id: 4,
-      title: 'آزمون حقوق تجارت و شرکت ها',
-      description: 'قوانین تجارت، شرکت های تجاری و ورشکستگی',
-      questions: 60,
-      duration: 120,
-      difficulty: 'hard',
-      subject: 'commercial',
-      participants: 650,
-      averageScore: 58,
-      tags: ['حقوق تجارت', 'پیشرفته']
-    },
-    {
-      id: 5,
-      title: 'آزمون حقوق اساسی و اداری',
-      description: 'قانون اساسی و حقوق اداری ایران',
-      questions: 45,
-      duration: 75,
-      difficulty: 'medium',
-      subject: 'constitutional',
-      participants: 980,
-      averageScore: 69,
-      tags: ['حقوق اساسی', 'متوسط']
-    },
-    {
-      id: 6,
-      title: 'آزمون آزمایشی جامع - سری دوم',
-      description: 'آزمون پیشرفته برای آمادگی نهایی',
-      questions: 120,
-      duration: 200,
-      difficulty: 'hard',
-      subject: 'comprehensive',
-      participants: 750,
-      averageScore: 62,
-      tags: ['جامع', 'پیشرفته', 'تخصصی']
-    },
-    {
-      id: 7,
-      title: 'آزمون سریع - مرور کلی',
-      description: 'مرور سریع تمامی مباحث در زمان محدود',
-      questions: 30,
-      duration: 45,
-      difficulty: 'easy',
-      subject: 'comprehensive',
-      participants: 2100,
-      averageScore: 75,
-      tags: ['سریع', 'مرور', 'آسان']
-    },
-    {
-      id: 8,
-      title: 'آزمون حقوق خانواده',
-      description: 'احوال شخصیه، ازدواج، طلاق و ارث',
-      questions: 35,
-      duration: 60,
-      difficulty: 'medium',
-      subject: 'family',
-      participants: 1100,
-      averageScore: 71,
-      tags: ['حقوق خانواده', 'متوسط']
-    }
-  ];
 
   const subjects = [
     { value: 'all', label: 'همه موضوعات' },
@@ -177,7 +178,7 @@ const MockExams = () => {
     }
 
     setFilteredExams(filtered);
-  }, [selectedSubject, selectedDifficulty]);
+  }, [selectedSubject, selectedDifficulty]); // mockExams is now outside component, so no dependency needed
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {

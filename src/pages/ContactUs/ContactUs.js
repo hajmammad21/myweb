@@ -145,15 +145,30 @@ const ContactUs = () => {
               <div className="social-links">
                 <h3>شبکه های اجتماعی</h3>
                 <div className="social-icons">
-                  <a href="#" className="social-icon telegram">
+                  <a 
+                    href="https://t.me/yourusername" 
+                    className="social-icon telegram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <span>📱</span>
                     <span>تلگرام</span>
                   </a>
-                  <a href="#" className="social-icon instagram">
+                  <a 
+                    href="https://instagram.com/yourusername" 
+                    className="social-icon instagram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <span>📷</span>
                     <span>اینستاگرام</span>
                   </a>
-                  <a href="#" className="social-icon whatsapp">
+                  <a 
+                    href="https://wa.me/989123456789" 
+                    className="social-icon whatsapp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <span>💬</span>
                     <span>واتساپ</span>
                   </a>

@@ -12,7 +12,8 @@ const LessonsPdfs = () => {
   // Mock user data for testing
   const [mockUser] = useState({ name: 'کاربر آزمایشی', id: 1 });
 
-  const lessonPdfs = [
+  // Move lessonPdfs outside the component or make it a useMemo to avoid re-creation
+  const lessonPdfs = React.useMemo(() => [
     {
       id: 1,
       title: 'مبانی حقوق مدنی - جلد اول',
@@ -141,7 +142,7 @@ const LessonsPdfs = () => {
       previewUrl: '/pdfs/international-law-preview.pdf',
       downloadUrl: '/pdfs/international-law.pdf'
     }
-  ];
+  ], []);
 
   const categories = [
     { value: 'all', label: 'همه دسته‌ها' },
@@ -216,7 +217,7 @@ const LessonsPdfs = () => {
     }
 
     setFilteredPdfs(filtered);
-  }, [selectedCategory, selectedLevel, searchTerm]);
+  }, [selectedCategory, selectedLevel, searchTerm, lessonPdfs]);
 
   const getLevelColor = (level) => {
     switch (level) {

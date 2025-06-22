@@ -10,6 +10,7 @@ import ContactUs from './pages/ContactUs/ContactUs';
 import MockExams from './pages/MockExams/MockExams';
 import LessonsPdfs from './pages/LessonsPdfs/LessonsPdfs';
 import SummaryNotes from './pages/SummaryNotes/SummaryNotes';
+import Dashboard from './pages/Dashboard/Dashboard';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/mock-exams" element={<MockExams />} />
         <Route path="/lessons-pdfs" element={<LessonsPdfs />} />
         <Route path="/summary-notes" element={<SummaryNotes />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
       <Toaster position="top-right" />
     </Router>
