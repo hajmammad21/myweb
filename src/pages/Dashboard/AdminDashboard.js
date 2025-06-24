@@ -1,57 +1,81 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const [messages, setMessages] = useState([]);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const [sendToAll, setSendToAll] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [message, setMessage] = useState('');
+  const [feedback, setFeedback] = useState('');
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const res = await axios.get('http://localhost:5000/api/contact', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setMessages(res.data);
-      } catch (err) {
-        console.error('Failed to load messages:', err);
-      }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setFeedback('');
+
+    const body = {
+      user_id: sendToAll ? 'all' : userId,
+      message,
     };
 
-    fetchMessages();
-  }, [token]);
+    fetch('http://localhost:5000/api/users/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.msg) setFeedback(data.msg);
+        else setFeedback('ارسال موفق بود.');
+      })
+      .catch(() => setFeedback('خطا در ارسال.'));
+  };
 
   return (
-    <div className="dashboard-container" style={{ padding: '2rem', direction: 'rtl' }}>
-      <h2>داشبورد ادمین</h2>
-      <p>مدیر محترم، {user?.name} عزیز خوش آمدید.</p>
+    <div className="admin-dashboard">
+      <h2>داشبورد مدیر</h2>
 
-      <h3 style={{ marginTop: '2rem' }}>پیام‌های کاربران:</h3>
-      {messages.length === 0 ? (
-        <p>پیامی یافت نشد.</p>
-      ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {messages.map((msg) => (
-            <li
-              key={msg.id}
-              style={{
-                marginBottom: '1.5rem',
-                padding: '1rem',
-                border: '1px solid #ccc',
-                borderRadius: '10px',
-                background: '#f9f9f9'
-              }}
-            >
-              <p><strong>نام:</strong> {msg.name}</p>
-              <p><strong>ایمیل:</strong> {msg.email}</p>
-              <p><strong>پیام:</strong> {msg.message}</p>
-              <p><strong>تاریخ:</strong> {new Date(msg.created_at).toLocaleString('fa-IR')}</p>
-            </li>
-          ))}
-        </ul>
-      )}
+      <section className="notification-form">
+        <h3>ارسال اعلان</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={sendToAll}
+                onChange={() => setSendToAll(!sendToAll)}
+              />
+              ارسال به همه کاربران
+            </label>
+          </div>
+
+          {!sendToAll && (
+            <div>
+              <label>شناسه کاربر:</label>
+              <input
+                type="text"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
+          <div>
+            <label>متن پیام:</label>
+            <textarea
+              rows="4"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit">ارسال اعلان</button>
+        </form>
+        {feedback && <p className="feedback-msg">{feedback}</p>}
+      </section>
     </div>
   );
 };

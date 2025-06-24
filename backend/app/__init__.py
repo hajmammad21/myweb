@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-from app.db import db
+from app.extensions import db, jwt
 from app.routes.auth import auth_bp
 from app.routes.users import users_bp
 from app.utils import create_admin_user
@@ -20,6 +20,7 @@ def create_app():
     CORS(app)
 
     db.init_app(app)
+    jwt.init_app(app)
     migrate.init_app(app, db)  # ← properly initialize migrate here
     JWTManager(app)
 

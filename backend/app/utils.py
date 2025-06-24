@@ -1,5 +1,5 @@
 from app.models import User
-from app.db import db
+from app.extensions import db
 
 def create_admin_user():
     if not User.query.filter_by(email="admin@example.com").first():

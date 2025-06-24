@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.db import db
+from app.extensions import db
 from app.models import ContactMessage
 
 contact_bp = Blueprint('contact', __name__)
