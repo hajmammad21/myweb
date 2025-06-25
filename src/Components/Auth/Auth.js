@@ -141,18 +141,18 @@ const Auth = () => {
 
           <button
             type="submit"
-            className="submit-button"
+            className={`submit-button ${loading ? 'loading' : ''}`}
             disabled={loading}
           >
             {loading ? (
-              <div className="loading-spinner">
-                <span className="spinner"></span>
-                {isLogin ? 'در حال ورود...' : 'در حال ثبت‌نام...'}
-              </div>
-            ) : (
-              isLogin ? 'ورود' : 'ثبت‌نام'
-            )}
-          </button>
+          <>
+            <span className="spinner"></span>
+            <span>{isLogin ? 'ورود...' : 'ثبت‌نام...'}</span>
+          </>
+          ) : (
+            isLogin ? 'ورود' : 'ثبت‌نام'
+        )}
+</button>
         </form>
 
         <div className="auth-footer">
@@ -172,11 +172,17 @@ export async function fetchWithAuth(url, options = {}, retry = true) {
   const token = localStorage.getItem('token');
   const refreshToken = localStorage.getItem('refreshToken');
 
+if (!(options.body instanceof FormData)) {
   options.headers = {
     ...(options.headers || {}),
-    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
+}
+
+options.headers = {
+  ...(options.headers || {}),
+  Authorization: `Bearer ${token}`,
+};
 
   let response = await fetch(url, options);
 

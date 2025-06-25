@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './UserDashboard.css';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
+import toast from 'react-hot-toast';
 
 // Enhanced Mark as Read Button Component
 const MarkAsReadButton = ({ notificationId, onMarkAsRead, isRead = false }) => {
@@ -60,16 +61,25 @@ const UserDashboard = () => {
   const [passwordMsgType, setPasswordMsgType] = useState('error'); // 'error' or 'success'
 
   useEffect(() => {
-    fetchWithAuth('http://localhost:5000/api/users/notifications')
-      .then((res) => res.json())
-      .then((data) => {
+  fetchWithAuth('http://localhost:5000/api/users/notifications')
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Notification response:', data);
+
+      if (Array.isArray(data)) {
         setNotifications(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
+      } else {
+        console.warn("Unexpected notifications response:", data);
+        setNotifications([]); // Prevent .map() crash
+      }
+
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Notification fetch error:", err);
+      setLoading(false);
+    });
+}, []);
 
   // Enhanced markAsRead function with error handling
   const markAsRead = async (id) => {
@@ -97,7 +107,7 @@ const UserDashboard = () => {
     setPasswordMsgType('error');
 
     if (newPassword !== confirmPassword) {
-      setPasswordMsg('رمزهای جدید یکسان نیستند.');
+      toast.error('رمزهای جدید یکسان نیستند.');
       setPasswordMsgType('error');
       return;
     }
@@ -129,7 +139,7 @@ const UserDashboard = () => {
         }
       })
       .catch(() => {
-        setPasswordMsg('خطایی رخ داده است.');
+        toast.error('خطایی رخ داده است.');
         setPasswordMsgType('error');
       });
   };

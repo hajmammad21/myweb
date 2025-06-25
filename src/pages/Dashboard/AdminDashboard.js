@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './AdminDashboard.css';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
+import AdminProductReview from './AdminProductReview';
+import AdminContactMessages from './AdminContactMessages';
 
 const AdminDashboard = () => {
   const [sendToAll, setSendToAll] = useState(false);
@@ -72,6 +74,8 @@ const AdminDashboard = () => {
         </form>
         {feedback && <p className="feedback-msg">{feedback}</p>}
       </section>
+      <AdminProductReview />
+      <AdminContactMessages />
     </div>
   );
 };

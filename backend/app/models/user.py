@@ -7,6 +7,7 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    is_teacher = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -19,5 +20,6 @@ class User(db.Model):
             "id": self.id,
             "email": self.email,
             "name": self.name,
-            "is_admin": self.is_admin
+            "is_admin": self.is_admin,
+            "is_teacher": self.is_teacher
         }

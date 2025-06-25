@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from app.extensions import db
 from app.models import ContactMessage
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.models import User
 
 contact_bp = Blueprint('contact', __name__)
 
@@ -23,6 +25,11 @@ def submit_contact():
     return jsonify({"message": "Message received"}), 201
 
 @contact_bp.route('/contact', methods=['GET'])
+@jwt_required()
 def get_messages():
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({"msg": "Admins only"}), 403
+
     messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
     return jsonify([msg.to_dict() for msg in messages]), 200

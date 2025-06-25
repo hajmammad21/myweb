@@ -14,5 +14,5 @@ class ContactMessage(db.Model):
             "name": self.name,
             "email": self.email,
             "message": self.message,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }

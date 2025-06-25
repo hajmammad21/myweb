@@ -4,6 +4,10 @@ from app.models import User
 from app.models.notification import Notification
 from app.extensions import db
 from datetime import datetime
+import os
+from werkzeug.utils import secure_filename
+from flask import current_app
+from app.models import Product
 
 users_bp = Blueprint('users', __name__)
 
@@ -104,3 +108,85 @@ def mark_notification_as_read(id):
     db.session.commit()
 
     return jsonify({"msg": "Notification marked as read."}), 200
+
+
+@users_bp.route('/teacher/products', methods=['POST'])
+@jwt_required()
+def submit_product():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user or not user.is_teacher:
+        return jsonify({"msg": "Only teachers can submit products."}), 403
+
+    title = request.form.get('title')
+    description = request.form.get('description')
+    price = request.form.get('price')
+    file = request.files.get('file')
+
+    # 🔍 Debug log
+    print("DEBUG:", title, price, file)
+
+    # Validate fields
+    if not title or not price or not file:
+        return jsonify({"msg": "Missing required fields."}), 400
+
+    try:
+        price = float(price)
+    except ValueError:
+        return jsonify({"msg": "Invalid price format."}), 400
+
+    filename = secure_filename(file.filename)
+    upload_path = os.path.join(current_app.root_path, 'static', 'products')
+    os.makedirs(upload_path, exist_ok=True)
+    file.save(os.path.join(upload_path, filename))
+
+    file_url = f'/static/products/{filename}'
+
+    product = Product(
+        teacher_id=user.id,
+        title=title,
+        description=description,
+        price=price,
+        file_url=file_url,
+        is_approved=False
+    )
+
+    db.session.add(product)
+    db.session.commit()
+
+    return jsonify({"msg": "محصول با موفقیت ارسال شد و در انتظار تایید است."}), 201
+
+
+@users_bp.route('/admin/products', methods=['GET'])
+@jwt_required()
+def list_pending_products():
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({"msg": "Admins only"}), 403
+
+    products = Product.query.filter_by(is_approved=False).all()
+    return jsonify([p.to_dict() for p in products]), 200
+
+@users_bp.route('/admin/products/<int:product_id>/approve', methods=['PUT'])
+@jwt_required()
+def approve_product(product_id):
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({"msg": "Admins only"}), 403
+
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"msg": "Product not found"}), 404
+
+    data = request.get_json()
+    category = data.get('category')
+
+    if not category:
+        return jsonify({"msg": "Please select a category"}), 400
+
+    product.is_approved = True
+    product.category = category
+    db.session.commit()
+
+    return jsonify({"msg": "Product approved and categorized."}), 200
