@@ -47,10 +47,12 @@ const Auth = () => {
 
       if (isLogin) {
         const token = res.data.access_token;
+        const refreshToken = res.data.refresh_token;
         const user = res.data.user;
         
         // Store both token and user data
         localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('user', JSON.stringify(user));
         
         // Dispatch custom event to notify header and other components
@@ -73,6 +75,7 @@ const Auth = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="auth-container">
@@ -164,5 +167,46 @@ const Auth = () => {
     </div>
   );
 };
+
+export async function fetchWithAuth(url, options = {}, retry = true) {
+  const token = localStorage.getItem('token');
+  const refreshToken = localStorage.getItem('refreshToken');
+
+  options.headers = {
+    ...(options.headers || {}),
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+
+  let response = await fetch(url, options);
+
+  // If access token expired, try to refresh it
+  if (response.status === 401 && retry && refreshToken) {
+    const refreshResponse = await fetch('http://localhost:5000/api/auth/refresh', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
+    });
+
+    if (refreshResponse.ok) {
+      const data = await refreshResponse.json();
+      localStorage.setItem('token', data.access_token);
+
+      // Retry original request with new access token
+      options.headers.Authorization = `Bearer ${data.access_token}`;
+      return fetchWithAuth(url, options, false);
+    } else {
+      // Refresh failed — logout user
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+  }
+
+  return response;
+}
+
 
 export default Auth;

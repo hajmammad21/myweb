@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import './AdminDashboard.css';
+import { fetchWithAuth } from '../../Components/Auth/Auth';
 
 const AdminDashboard = () => {
   const [sendToAll, setSendToAll] = useState(false);
   const [userId, setUserId] = useState('');
   const [message, setMessage] = useState('');
   const [feedback, setFeedback] = useState('');
-  const token = localStorage.getItem('token');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,12 +17,8 @@ const AdminDashboard = () => {
       message,
     };
 
-    fetch('http://localhost:5000/api/users/notifications', {
+    fetchWithAuth('http://localhost:5000/api/users/notifications', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(body),
     })
       .then((res) => res.json())
