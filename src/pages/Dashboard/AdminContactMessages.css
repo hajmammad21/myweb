@@ -1,0 +1,111 @@
+.contact-messages-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border: 1px solid #e2e8f0;
+  height: fit-content;
+}
+
+.contact-messages-section h3 {
+  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.contact-messages-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.contact-message-item {
+  background: #f8fafc;
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.contact-message-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contact-message-item p {
+  margin: 0.75rem 0;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.contact-message-item p strong {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.contact-message-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  border-left: 4px solid #3b82f6;
+  font-style: italic;
+}
+
+.delete-message-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 1rem;
+}
+
+.delete-message-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+}
+
+.delete-message-btn:active {
+  transform: translateY(0);
+}
+
+.loading-message,
+.no-messages {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+/* Custom scrollbar for message list */
+.contact-messages-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.contact-messages-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.contact-messages-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.contact-messages-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

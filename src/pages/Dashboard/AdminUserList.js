@@ -1,63 +1,122 @@
 import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
+import './AdminUserList.css';
 
 const AdminUserList = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchWithAuth('http://localhost:5000/api/users/admin/all')
       .then(res => res.json())
-      .then(data => setUsers(data));
+      .then(data => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+        console.error('خطا در دریافت کاربران');
+      });
   }, []);
 
+  const getUserRoleClass = (user) => {
+    if (user.is_admin) return 'admin';
+    if (user.is_teacher) return 'teacher';
+    return 'user';
+  };
+
+  const getUserRoleText = (user) => {
+    if (user.is_admin) return 'مدیر';
+    if (user.is_teacher) return 'معلم';
+    return 'کاربر';
+  };
+
+  const getStats = () => {
+    const totalUsers = users.length;
+    const admins = users.filter(u => u.is_admin).length;
+    const teachers = users.filter(u => u.is_teacher).length;
+    const regularUsers = users.filter(u => !u.is_admin && !u.is_teacher).length;
+
+    return { totalUsers, admins, teachers, regularUsers };
+  };
+
+  const stats = getStats();
+
+  if (loading) {
+    return (
+      <section className="user-list-section">
+        <h3>لیست کاربران</h3>
+        <div className="loading-message">در حال بارگذاری...</div>
+      </section>
+    );
+  }
+
   return (
-    <div style={{ padding: '2rem', direction: 'rtl', fontFamily: 'Vazirmatn' }}>
+    <section className="user-list-section">
       <h3>لیست کاربران</h3>
+      
+      {/* Stats Cards */}
+      <div className="users-stats">
+        <div className="stat-card">
+          <div className="stat-number">{stats.totalUsers}</div>
+          <div className="stat-label2">کل کاربران</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-number">{stats.admins}</div>
+          <div className="stat-label2">مدیران</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-number">{stats.teachers}</div>
+          <div className="stat-label2">معلمان</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-number">{stats.regularUsers}</div>
+          <div className="stat-label2">کاربران عادی</div>
+        </div>
+      </div>
+
       {users.length === 0 ? (
-        <p>کاربری ثبت نشده است.</p>
+        <div className="no-users">کاربری ثبت نشده است.</div>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+        <table className="users-table">
           <thead>
-            <tr style={{ backgroundColor: '#f3f4f6' }}>
-              <th style={th}>نام</th>
-              <th style={th}>ایمیل</th>
-              <th style={th}>نقش</th>
-              <th style={th}>تاریخ عضویت</th>
+            <tr>
+              <th>نام</th>
+              <th>ایمیل</th>
+              <th>نقش</th>
+              <th>تاریخ عضویت</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
-              <tr key={u.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={td}>{u.name}</td>
-                <td style={td}>{u.email}</td>
-                <td style={td}>
-                  {u.is_admin ? 'مدیر' : u.is_teacher ? 'معلم' : 'کاربر'}
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>
+                  <span className="user-name">{user.name}</span>
                 </td>
-                <td style={td}>
-                    {new Date(u.created_at).toLocaleDateString('en-GB', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                })}
-            </td>
+                <td>
+                  <span className="user-email">{user.email}</span>
+                </td>
+                <td>
+                  <span className={`user-role ${getUserRoleClass(user)}`}>
+                    {getUserRoleText(user)}
+                  </span>
+                </td>
+                <td>
+                  <span className="user-date">
+                    {new Date(user.created_at).toLocaleDateString('fa-IR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-    </div>
+    </section>
   );
-};
-
-const th = {
-  padding: '0.6rem',
-  border: '1px solid #ddd',
-  fontWeight: 'bold',
-};
-
-const td = {
-  padding: '0.6rem',
-  border: '1px solid #ddd',
 };
 
 export default AdminUserList;

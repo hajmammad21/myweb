@@ -16,40 +16,46 @@ const AdminContactMessages = () => {
       .catch(() => setLoading(false));
   }, []);
 
+  const deleteMessage = (msgId) => {
+    if (window.confirm('آیا از حذف این پیام مطمئن هستید؟')) {
+      fetchWithAuth(`http://localhost:5000/api/contact/${msgId}`, {
+        method: 'DELETE',
+      }).then(() => {
+        setMessages((prev) => prev.filter((m) => m.id !== msgId));
+      }).catch(() => {
+        alert('خطا در حذف پیام');
+      });
+    }
+  };
+
   return (
-    <div style={{ padding: '2rem', direction: 'rtl', fontFamily: 'Vazirmatn' }}>
+    <section className="contact-messages-section">
       <h3>پیام‌های تماس با ما</h3>
       {loading ? (
-        <p>در حال بارگذاری...</p>
+        <div className="loading-message">در حال بارگذاری...</div>
       ) : messages.length === 0 ? (
-        <p>پیامی برای نمایش وجود ندارد.</p>
+        <div className="no-messages">پیامی برای نمایش وجود ندارد.</div>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <ul className="contact-messages-list">
           {messages.map((msg) => (
-            <li key={msg.id} style={{ background: '#f9fafb', marginBottom: '1rem', padding: '1rem', borderRadius: '10px' }}>
+            <li key={msg.id} className="contact-message-item">
               <p><strong>نام:</strong> {msg.name}</p>
-              <p><strong>ایمیل:</strong> {msg.email}</p>
-              <p><strong>زمان ارسال:</strong> {new Date(msg.created_at).toLocaleString('fa-IR')}</p>
-              <p><strong>پیام:</strong> {msg.message}</p>
+              <p><strong>ایمیل:</strong> <span className="user-email">{msg.email}</span></p>
+              <p><strong>زمان ارسال:</strong> <span className="user-date">{new Date(msg.created_at).toLocaleString('fa-IR')}</span></p>
+              <div className="contact-message-content">
+                <strong>پیام:</strong> {msg.message}
+              </div>
               <button
                 className="delete-message-btn"
-                onClick={() => {
-              if (window.confirm('آیا از حذف این پیام مطمئن هستید؟')) {
-                fetchWithAuth(`http://localhost:5000/api/contact/${msg.id}`, {
-                method: 'DELETE',
-              }).then(() => {
-                setMessages((prev) => prev.filter((m) => m.id !== msg.id));
-            });
-           }
-         }}
-        >
-  حذف از داشبورد
-</button>
+                onClick={() => deleteMessage(msg.id)}
+              >
+                حذف از داشبورد
+              </button>
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
 };
 

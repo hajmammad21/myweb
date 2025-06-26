@@ -28,6 +28,9 @@ const AdminDashboard = () => {
       .then((data) => {
         if (data.msg) setFeedback(data.msg);
         else setFeedback('ارسال موفق بود.');
+        setMessage('');
+        setUserId('');
+        setSendToAll(false);
       })
       .catch(() => setFeedback('خطا در ارسال.'));
   };
@@ -36,47 +39,60 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
       <h2>داشبورد مدیر</h2>
 
-      <section className="notification-form">
-        <h3>ارسال اعلان</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={sendToAll}
-                onChange={() => setSendToAll(!sendToAll)}
-              />
-              ارسال به همه کاربران
-            </label>
-          </div>
+      {/* Top row - Notifications and Contact Messages side by side */}
+      <div className="admin-top-row">
+        <section className="notification-section">
+          <h3>ارسال اعلان</h3>
+          <div className="notification-form">
+            <form onSubmit={handleSubmit}>
+              <div className="checkbox-group">
+                <input
+                  type="checkbox"
+                  id="sendToAll"
+                  checked={sendToAll}
+                  onChange={() => setSendToAll(!sendToAll)}
+                />
+                <label htmlFor="sendToAll">ارسال به همه کاربران</label>
+              </div>
 
-          {!sendToAll && (
-            <div>
-              <label>شناسه کاربر:</label>
-              <input
-                type="text"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                required
-              />
-            </div>
-          )}
+              {!sendToAll && (
+                <div>
+                  <label htmlFor="userId">شناسه کاربر:</label>
+                  <input
+                    id="userId"
+                    type="text"
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    required
+                    placeholder="شناسه کاربر را وارد کنید"
+                  />
+                </div>
+              )}
 
-          <div>
-            <label>متن پیام:</label>
-            <textarea
-              rows="4"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              required
-            />
+              <div>
+                <label htmlFor="message">متن پیام:</label>
+                <textarea
+                  id="message"
+                  rows="4"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                  placeholder="متن پیام خود را وارد کنید..."
+                />
+              </div>
+              <button type="submit">ارسال اعلان</button>
+            </form>
+            {feedback && <p className="feedback-msg">{feedback}</p>}
           </div>
-          <button type="submit">ارسال اعلان</button>
-        </form>
-        {feedback && <p className="feedback-msg">{feedback}</p>}
-      </section>
+        </section>
+
+        <AdminContactMessages />
+      </div>
+
+      {/* Product Review Section */}
       <AdminProductReview />
-      <AdminContactMessages />
+
+      {/* User List Section */}
       <AdminUserList />
     </div>
   );
