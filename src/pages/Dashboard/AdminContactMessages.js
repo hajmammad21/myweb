@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
+import './AdminContactMessages.css';
 
 const AdminContactMessages = () => {
   const [messages, setMessages] = useState([]);
@@ -30,6 +31,20 @@ const AdminContactMessages = () => {
               <p><strong>ایمیل:</strong> {msg.email}</p>
               <p><strong>زمان ارسال:</strong> {new Date(msg.created_at).toLocaleString('fa-IR')}</p>
               <p><strong>پیام:</strong> {msg.message}</p>
+              <button
+                className="delete-message-btn"
+                onClick={() => {
+              if (window.confirm('آیا از حذف این پیام مطمئن هستید؟')) {
+                fetchWithAuth(`http://localhost:5000/api/contact/${msg.id}`, {
+                method: 'DELETE',
+              }).then(() => {
+                setMessages((prev) => prev.filter((m) => m.id !== msg.id));
+            });
+           }
+         }}
+        >
+  حذف از داشبورد
+</button>
             </li>
           ))}
         </ul>

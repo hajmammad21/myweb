@@ -3,6 +3,7 @@ import './AdminDashboard.css';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
 import AdminProductReview from './AdminProductReview';
 import AdminContactMessages from './AdminContactMessages';
+import AdminUserList from './AdminUserList';
 
 const AdminDashboard = () => {
   const [sendToAll, setSendToAll] = useState(false);
@@ -76,6 +77,7 @@ const AdminDashboard = () => {
       </section>
       <AdminProductReview />
       <AdminContactMessages />
+      <AdminUserList />
     </div>
   );
 };

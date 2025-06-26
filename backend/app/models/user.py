@@ -1,5 +1,6 @@
 from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -8,6 +9,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_teacher = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -21,5 +23,6 @@ class User(db.Model):
             "email": self.email,
             "name": self.name,
             "is_admin": self.is_admin,
-            "is_teacher": self.is_teacher
+            "is_teacher": self.is_teacher,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }

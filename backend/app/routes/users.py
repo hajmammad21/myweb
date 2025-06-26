@@ -190,3 +190,13 @@ def approve_product(product_id):
     db.session.commit()
 
     return jsonify({"msg": "Product approved and categorized."}), 200
+
+@users_bp.route('/admin/all', methods=['GET'])
+@jwt_required()
+def list_all_users():
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({"msg": "Admins only"}), 403
+
+    users = User.query.order_by(User.created_at.desc()).all()
+    return jsonify([u.to_dict() for u in users]), 200

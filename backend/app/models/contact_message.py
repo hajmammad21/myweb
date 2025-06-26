@@ -7,6 +7,7 @@ class ContactMessage(db.Model):
     email = db.Column(db.String(120), nullable=False)
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_deleted = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
         return {
@@ -14,5 +15,6 @@ class ContactMessage(db.Model):
             "name": self.name,
             "email": self.email,
             "message": self.message,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "is_deleted": self.is_deleted
         }

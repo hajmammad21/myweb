@@ -31,5 +31,20 @@ def get_messages():
     if not user or not user.is_admin:
         return jsonify({"msg": "Admins only"}), 403
 
-    messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
+    messages = ContactMessage.query.filter_by(is_deleted=False).order_by(ContactMessage.created_at.desc()).all()
     return jsonify([msg.to_dict() for msg in messages]), 200
+
+@contact_bp.route('/contact/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_message(id):
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({"msg": "Admins only"}), 403
+
+    msg = ContactMessage.query.get(id)
+    if not msg:
+        return jsonify({"msg": "Message not found"}), 404
+
+    msg.is_deleted = True
+    db.session.commit()
+    return jsonify({"msg": "Message hidden from panel."}), 200
