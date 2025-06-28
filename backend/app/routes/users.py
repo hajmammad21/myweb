@@ -200,3 +200,15 @@ def list_all_users():
 
     users = User.query.order_by(User.created_at.desc()).all()
     return jsonify([u.to_dict() for u in users]), 200
+
+@users_bp.route('/teacher/notifications', methods=['GET'])
+@jwt_required()
+def get_teacher_notifications():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user or not user.is_teacher:
+        return jsonify({"msg": "Only Teachers can access this."}), 403
+    
+    notifications = Notification.query.filter_by(user_id=user.id).order_by(Notification.created_at.desc()).all()
+    return jsonify([n.to_dict() for n in notifications]), 200

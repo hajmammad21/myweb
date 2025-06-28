@@ -81,6 +81,7 @@ const AdminUserList = () => {
         <table className="users-table">
           <thead>
             <tr>
+              <th>شناسه</th>
               <th>نام</th>
               <th>ایمیل</th>
               <th>نقش</th>
@@ -90,6 +91,9 @@ const AdminUserList = () => {
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
+                <td>
+                  <span className='user_id'>{user.id}</span>
+                </td>
                 <td>
                   <span className="user-name">{user.name}</span>
                 </td>

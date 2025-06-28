@@ -117,6 +117,10 @@
   color: #6b7280;
   font-size: 0.9rem;
 }
+.user-id {
+  font-weight: bold;
+  padding: 0.5rem;
+}
 
 .user-date {
   color: #4b5563;
