@@ -6,6 +6,7 @@ import './Auth.css';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,6 +17,19 @@ const Auth = () => {
 
   const handleToggle = () => {
     setIsLogin(!isLogin);
+    setIsForgotPassword(false);
+    setFormData({ name: '', email: '', password: '' });
+  };
+
+  const handleForgotPassword = () => {
+    setIsForgotPassword(true);
+    setIsLogin(false);
+    setFormData({ name: '', email: '', password: '' });
+  };
+
+  const handleBackToLogin = () => {
+    setIsForgotPassword(false);
+    setIsLogin(true);
     setFormData({ name: '', email: '', password: '' });
   };
 
@@ -24,8 +38,41 @@ const Auth = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { email } = formData;
+
+    if (!email) {
+      toast.error('لطفاً ایمیل خود را وارد کنید');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/forgot-password', {
+        email
+      });
+
+      toast.success('لینک بازنشانی رمز عبور به ایمیل شما ارسال شد');
+      setFormData({ name: '', email: '', password: '' });
+      handleBackToLogin();
+    } catch (err) {
+      const message = err.response?.data?.message || 'خطا در ارسال ایمیل بازنشانی';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isForgotPassword) {
+      return handleForgotPasswordSubmit(e);
+    }
+
     setLoading(true);
 
     const { name, email, password } = formData;
@@ -50,17 +97,14 @@ const Auth = () => {
         const refreshToken = res.data.refresh_token;
         const user = res.data.user;
         
-        // Store both token and user data
         localStorage.setItem('token', token);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('user', JSON.stringify(user));
         
-        // Dispatch custom event to notify header and other components
         window.dispatchEvent(new Event('authChange'));
         
         toast.success('با موفقیت وارد شدید');
         
-        // Redirect to dashboard or home page
         navigate('/');
       } else {
         toast.success('ثبت‌نام با موفقیت انجام شد. اکنون وارد شوید');
@@ -75,7 +119,18 @@ const Auth = () => {
       setLoading(false);
     }
   };
-  
+
+  const getTitle = () => {
+    if (isForgotPassword) return 'بازنشانی رمز عبور';
+    return isLogin ? 'ورود' : 'ثبت‌نام';
+  };
+
+  const getSubtitle = () => {
+    if (isForgotPassword) return 'ایمیل خود را وارد کنید تا لینک بازنشانی برای شما ارسال شود';
+    return isLogin
+      ? 'برای ادامه وارد حساب کاربری خود شوید'
+      : 'برای ایجاد حساب جدید فرم زیر را پر کنید';
+  };
 
   return (
     <div className="auth-container">
@@ -86,16 +141,12 @@ const Auth = () => {
       <div className="auth-card">
         <div className="card-header-decoration"></div>
         <div className="auth-header">
-          <h2 className="auth-title">{isLogin ? 'ورود' : 'ثبت‌نام'}</h2>
-          <p className="auth-subtitle">
-            {isLogin
-              ? 'برای ادامه وارد حساب کاربری خود شوید'
-              : 'برای ایجاد حساب جدید فرم زیر را پر کنید'}
-          </p>
+          <h2 className="auth-title">{getTitle()}</h2>
+          <p className="auth-subtitle">{getSubtitle()}</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          {!isLogin && (
+          {!isLogin && !isForgotPassword && (
             <div className="form-group">
               <label className="form-label" htmlFor="name">نام کامل</label>
               <input
@@ -125,19 +176,33 @@ const Auth = () => {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">رمز عبور</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="form-input"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="رمز عبور"
-              required
-            />
-          </div>
+          {!isForgotPassword && (
+            <div className="form-group">
+              <label className="form-label" htmlFor="password">رمز عبور</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="form-input"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="رمز عبور"
+                required
+              />
+            </div>
+          )}
+
+          {isLogin && !isForgotPassword && (
+            <div className="forgot-password-link">
+              <button 
+                type="button" 
+                onClick={handleForgotPassword}
+                className="forgot-password-button"
+              >
+                فراموشی رمز عبور؟
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"
@@ -145,23 +210,34 @@ const Auth = () => {
             disabled={loading}
           >
             {loading ? (
-          <>
-            <span className="spinner"></span>
-            <span>{isLogin ? 'ورود...' : 'ثبت‌نام...'}</span>
-          </>
-          ) : (
-            isLogin ? 'ورود' : 'ثبت‌نام'
-        )}
-</button>
+              <>
+                <span className="spinner"></span>
+                <span>
+                  {isForgotPassword ? 'ارسال...' : isLogin ? 'ورود...' : 'ثبت‌نام...'}
+                </span>
+              </>
+            ) : (
+              isForgotPassword ? 'ارسال لینک بازنشانی' : isLogin ? 'ورود' : 'ثبت‌نام'
+            )}
+          </button>
         </form>
 
         <div className="auth-footer">
-          <p className="footer-text">
-            {isLogin ? 'حساب کاربری ندارید؟' : 'قبلاً ثبت‌نام کرده‌اید؟'}{' '}
-            <button onClick={handleToggle} className="back-button">
-              {isLogin ? 'ثبت‌نام کنید' : 'وارد شوید'}
-            </button>
-          </p>
+          {isForgotPassword ? (
+            <p className="footer-text">
+              یادتان آمد؟{' '}
+              <button onClick={handleBackToLogin} className="back-button">
+                بازگشت به ورود
+              </button>
+            </p>
+          ) : (
+            <p className="footer-text">
+              {isLogin ? 'حساب کاربری ندارید؟' : 'قبلاً ثبت‌نام کرده‌اید؟'}{' '}
+              <button onClick={handleToggle} className="back-button">
+                {isLogin ? 'ثبت‌نام کنید' : 'وارد شوید'}
+              </button>
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -172,21 +248,20 @@ export async function fetchWithAuth(url, options = {}, retry = true) {
   const token = localStorage.getItem('token');
   const refreshToken = localStorage.getItem('refreshToken');
 
-if (!(options.body instanceof FormData)) {
+  if (!(options.body instanceof FormData)) {
+    options.headers = {
+      ...(options.headers || {}),
+      'Content-Type': 'application/json',
+    };
+  }
+
   options.headers = {
     ...(options.headers || {}),
-    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
   };
-}
-
-options.headers = {
-  ...(options.headers || {}),
-  Authorization: `Bearer ${token}`,
-};
 
   let response = await fetch(url, options);
 
-  // If access token expired, try to refresh it
   if (response.status === 401 && retry && refreshToken) {
     const refreshResponse = await fetch('http://localhost:5000/api/auth/refresh', {
       method: 'POST',
@@ -199,11 +274,9 @@ options.headers = {
       const data = await refreshResponse.json();
       localStorage.setItem('token', data.access_token);
 
-      // Retry original request with new access token
       options.headers.Authorization = `Bearer ${data.access_token}`;
       return fetchWithAuth(url, options, false);
     } else {
-      // Refresh failed — logout user
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
@@ -213,6 +286,5 @@ options.headers = {
 
   return response;
 }
-
 
 export default Auth;

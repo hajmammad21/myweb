@@ -8,7 +8,15 @@ import os
 from werkzeug.utils import secure_filename
 from flask import current_app
 from app.models import Product
+from flask_mail import Message, Mail
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.extensions import mail
+from datetime import datetime, timedelta
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import secrets
 
+limiter = Limiter(get_remote_address)
 users_bp = Blueprint('users', __name__)
 
 @users_bp.route('/me', methods=['GET'])
@@ -212,3 +220,51 @@ def get_teacher_notifications():
     
     notifications = Notification.query.filter_by(user_id=user.id).order_by(Notification.created_at.desc()).all()
     return jsonify([n.to_dict() for n in notifications]), 200
+
+from flask import current_app
+
+@users_bp.route('/forgot-password', methods=['POST'])
+@limiter.limit("1 per minute")
+def forgot_password():
+    email = request.json.get('email')
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({"msg": "User not found."}), 404
+
+    reset_token = secrets.token_urlsafe(16)
+    reset_link = f'http://localhost:5000/reset-password/{reset_token}'
+
+    expiration_time = datetime.utcnow() + timedelta(hours=1)
+
+    user.reset_token = reset_token
+    user.reset_token_expires_at = expiration_time
+    db.session.commit()
+
+    msg = Message("Password Reset Request", recipients=[email])
+    msg.body = f"Click here to reset your password: {reset_link}"
+    mail.send(msg)
+
+    return jsonify({"msg": "Password reset link sent to email"}), 200
+
+
+@users_bp.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    user = User.query.filter_by(reset_token=token).first()
+
+    if not user:
+        return jsonify({"msg": "Invalid or expired token"}), 400
+
+    if datetime.utcnow() > user.reset_token_expires_at:
+        return jsonify({"msg": "Reset token has expired."}), 400
+
+    new_password = request.json.get('new_password')
+
+    if not new_password:
+        return jsonify({"msg": "New password is required."}), 400
+
+    user.password_hash = generate_password_hash(new_password)
+    user.reset_token = None
+    db.session.commit()
+
+    return jsonify({"msg": "Password reset successfully."}), 200

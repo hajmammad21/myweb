@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_mail import Mail  # Import the Mail object
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from app.extensions import db, jwt
@@ -12,15 +13,20 @@ import os
 
 load_dotenv()
 
+# Initialize Flask-Mail
+mail = Mail()
+
 migrate = Migrate()  # ← Moved to top level so Flask CLI can see it
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_pyfile('config.py')
+    app.config.from_pyfile('../config.py')
     CORS(app)
 
+    # Initialize Flask extensions
     db.init_app(app)
     jwt.init_app(app)
+    mail.init_app(app)  # Initialize Flask-Mail here
     migrate.init_app(app, db)  # ← properly initialize migrate here
     JWTManager(app)
 
