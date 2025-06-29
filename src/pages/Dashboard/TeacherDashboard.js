@@ -1,37 +1,82 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
+import './TeacherDashboard.css';
+
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className={`toast ${type}`}>
+      <button className="toast-close" onClick={onClose}>×</button>
+      {message}
+    </div>
+  );
+};
+
+const ToastContainer = ({ toasts, removeToast }) => {
+  return (
+    <div className="toast-container">
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => removeToast(toast.id)}
+        />
+      ))}
+    </div>
+  );
+};
 
 const TeacherDashboard = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [file, setFile] = useState(null);
-  const [feedback, setFeedback] = useState('');
+  
+  const [toasts, setToasts] = useState([]);
 
-  // State to store notifications
   const [notifications, setNotifications] = useState([]);
-  const [loadingNotifications, setLoadingNotifications] = useState(true); // Loading state for notifications
+  const [loadingNotifications, setLoadingNotifications] = useState(true);
 
-  // Fetch notifications when the component mounts
+  const addToast = (message, type = 'info') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
   useEffect(() => {
     fetchWithAuth('http://localhost:5000/api/users/teacher/notifications')
       .then((res) => res.json())
       .then((data) => {
         setNotifications(data);
         setLoadingNotifications(false);
+        
+        const unreadCount = data.filter(n => !n.is_read).length;
+        if (unreadCount > 0) {
+          addToast(`شما ${unreadCount} اعلان خوانده نشده دارید`, 'info');
+        }
       })
-      .catch(() => {
+      .catch((error) => {
         setLoadingNotifications(false);
+        addToast('خطا در بارگذاری اعلان‌ها', 'error');
       });
   }, []);
 
-  // Handle product submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFeedback('');
 
     if (!title || !file || !price) {
-      setFeedback('لطفاً تمام فیلدها را پر کنید.');
+      addToast('لطفاً تمام فیلدهای اجباری را پر کنید', 'error');
       return;
     }
 
@@ -42,97 +87,151 @@ const TeacherDashboard = () => {
     formData.append('file', file);
 
     try {
+      addToast('در حال ارسال محصول...', 'info');
+      
       const res = await fetchWithAuth('http://localhost:5000/api/users/teacher/products', {
         method: 'POST',
         body: formData,
       });
 
       const data = await res.json();
-      setFeedback(data.msg || 'محصول با موفقیت ارسال شد.');
-      setTitle('');
-      setDescription('');
-      setPrice('');
-      setFile(null);
+      
+      if (res.ok) {
+        addToast('محصول با موفقیت ارسال شد و در انتظار بررسی است', 'success');
+        setTitle('');
+        setDescription('');
+        setPrice('');
+        setFile(null);
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = '';
+      } else {
+        addToast(data.msg || 'خطا در ارسال محصول', 'error');
+      }
     } catch (err) {
-      setFeedback('خطا در ارسال محصول.');
+      addToast('خطا در ارتباط با سرور', 'error');
     }
   };
 
-  // Mark notification as read
   const markAsRead = (id) => {
     fetchWithAuth(`http://localhost:5000/api/users/notifications/${id}/read`, {
       method: 'PUT',
     })
       .then((res) => res.json())
       .then(() => {
-        // Update state to reflect the read status
-        setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+        setNotifications((prev) => 
+          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+        );
+        addToast('اعلان به عنوان خوانده شده علامت‌گذاری شد', 'success');
       })
-      .catch((err) => console.error('Error marking as read:', err));
+      .catch((err) => {
+        console.error('Error marking as read:', err);
+        addToast('خطا در علامت‌گذاری اعلان', 'error');
+      });
   };
 
   return (
-    <div style={{ padding: '2rem', direction: 'rtl', fontFamily: 'Vazirmatn' }}>
-      <h2>داشبورد مدرس</h2>
+    <>
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      
+      <div className="teacher-dashboard">
+        {/* Header */}
+        <header className="dashboard-header">
+          <h1 className="dashboard-title">داشبورد مدرس</h1>
+          <p className="dashboard-subtitle">مدیریت محصولات آموزشی و اعلان‌ها</p>
+        </header>
 
-      {/* Product upload form */}
-      <form onSubmit={handleSubmit} style={{ maxWidth: '500px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <label>عنوان محصول</label>
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        {/* Main Content */}
+        <div className="dashboard-content">
+          {/* Product Upload Form */}
+          <section className="form-section">
+            <h2 className="section-title">آپلود محصول جدید</h2>
+            <form onSubmit={handleSubmit} className="product-form">
+              <div className="form-group">
+                <label className="form-label">عنوان محصول *</label>
+                <input 
+                  type="text" 
+                  value={title} 
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="form-input"
+                  placeholder="عنوان محصول آموزشی خود را وارد کنید"
+                />
+              </div>
 
-        <label>توضیحات</label>
-        <textarea rows="4" value={description} onChange={(e) => setDescription(e.target.value)} />
+              <div className="form-group">
+                <label className="form-label">توضیحات</label>
+                <textarea 
+                  rows="4" 
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="form-input form-textarea"
+                  placeholder="توضیحات کاملی از محصول خود ارائه دهید"
+                />
+              </div>
 
-        <label>قیمت (تومان)</label>
-        <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+              <div className="form-group">
+                <label className="form-label">قیمت (تومان) *</label>
+                <input 
+                  type="number" 
+                  value={price} 
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="form-input"
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
 
-        <label>آپلود فایل (PDF یا ویدیو)</label>
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} required />
+              <div className="form-group">
+                <label className="form-label">آپلود فایل (PDF یا ویدیو) *</label>
+                <input 
+                  type="file" 
+                  onChange={(e) => setFile(e.target.files[0])}
+                  className="form-input form-file"
+                  accept=".pdf,.mp4,.avi,.mov,.wmv"
+                />
+              </div>
 
-        <button type="submit">ارسال برای بررسی</button>
-      </form>
+              <button type="submit" className="submit-btn">
+                ارسال برای بررسی
+              </button>
+            </form>
+          </section>
 
-      {/* Feedback message */}
-      {feedback && <p style={{ marginTop: '1rem', color: 'green', fontWeight: 'bold' }}>{feedback}</p>}
-
-      {/* Notifications Section */}
-      <section style={{ marginTop: '2rem' }}>
-        <h3>اعلانات</h3>
-        {loadingNotifications ? (
-          <p>در حال بارگذاری اعلان‌ها...</p>
-        ) : notifications.length === 0 ? (
-          <p>هیچ اعلان جدیدی وجود ندارد.</p>
-        ) : (
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {notifications.map((n) => (
-              <li key={n.id} style={{ background: '#f9fafb', marginBottom: '1rem', padding: '1rem', borderRadius: '10px' }}>
-                <p>{n.message}</p>
-                <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-                  <strong>تاریخ:</strong> {new Date(n.created_at).toLocaleString('fa-IR')}
-                </p>
-
-                {/* Mark as Read Button */}
-                {!n.is_read && (
-                  <button
-                    onClick={() => markAsRead(n.id)}
-                    style={{
-                      padding: '0.4rem 1rem',
-                      backgroundColor: '#10b981',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                    }}
+          {/* Notifications Section */}
+          <section className="notifications-section">
+            <h2 className="section-title">اعلان‌های سیستم</h2>
+            
+            {loadingNotifications ? (
+              <div className="loading-text">در حال بارگذاری اعلان‌ها...</div>
+            ) : notifications.length === 0 ? (
+              <div className="no-notifications">هیچ اعلان جدیدی وجود ندارد</div>
+            ) : (
+              <ul className="notifications-list">
+                {notifications.map((notification) => (
+                  <li 
+                    key={notification.id} 
+                    className={`notification-item ${!notification.is_read ? 'unread' : ''}`}
                   >
-                    مارک به عنوان خوانده‌شده
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+                    <p className="notification-message">{notification.message}</p>
+                    <p className="notification-date">
+                      <strong>تاریخ:</strong> {new Date(notification.created_at).toLocaleString('fa-IR')}
+                    </p>
+
+                    {!notification.is_read && (
+                      <button
+                        onClick={() => markAsRead(notification.id)}
+                        className="mark-read-btn"
+                      >
+                        علامت‌گذاری به عنوان خوانده‌شده
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      </div>
+    </>
   );
 };
 

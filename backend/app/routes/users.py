@@ -82,7 +82,7 @@ def create_notification():
     if target_user_id == 'all':
         users = User.query.all()
         for u in users:
-            if not u.is_admin:  # Optional: prevent sending to self/admins
+            if not u.is_admin:
                 notif = Notification(user_id=u.id, message=message)
                 db.session.add(notif)
         db.session.commit()
@@ -132,10 +132,6 @@ def submit_product():
     price = request.form.get('price')
     file = request.files.get('file')
 
-    # 🔍 Debug log
-    print("DEBUG:", title, price, file)
-
-    # Validate fields
     if not title or not price or not file:
         return jsonify({"msg": "Missing required fields."}), 400
 
