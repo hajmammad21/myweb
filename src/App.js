@@ -27,6 +27,8 @@ function App() {
         <Route path="/lessons-pdfs" element={<LessonsPdfs />} />
         <Route path="/summary-notes" element={<SummaryNotes />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<Auth />} />
+        <Route path="/reset-password/:token" element={<Auth />} />
       </Routes>
       <Toaster position="top-right" />
     </Router>

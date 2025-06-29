@@ -233,7 +233,7 @@ def forgot_password():
         return jsonify({"msg": "User not found."}), 404
 
     reset_token = secrets.token_urlsafe(16)
-    reset_link = f'http://localhost:5000/reset-password/{reset_token}'
+    reset_link = f'http://localhost:3000/reset-password/{reset_token}'
 
     expiration_time = datetime.utcnow() + timedelta(hours=1)
 
