@@ -262,6 +262,7 @@
 }
 
 .auth-section {
+  margin-right: 300px;
   display: flex;
   flex-shrink: 0;
 }
