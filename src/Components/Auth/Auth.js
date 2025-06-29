@@ -119,10 +119,9 @@ const Auth = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/users/reset-password', {
-        token: resetToken,
-        password
-      });
+      const res = await axios.post(`http://localhost:5000/api/users/reset-password/${resetToken}`, {
+      new_password: password
+    });
 
       toast.success('رمز عبور با موفقیت تغییر یافت');
       setFormData({ name: '', email: '', password: '', confirmPassword: '' });

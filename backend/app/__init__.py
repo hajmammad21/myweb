@@ -13,21 +13,19 @@ import os
 
 load_dotenv()
 
-# Initialize Flask-Mail
 mail = Mail()
 
-migrate = Migrate()  # ← Moved to top level so Flask CLI can see it
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_pyfile('../config.py')
     CORS(app)
 
-    # Initialize Flask extensions
     db.init_app(app)
     jwt.init_app(app)
-    mail.init_app(app)  # Initialize Flask-Mail here
-    migrate.init_app(app, db)  # ← properly initialize migrate here
+    mail.init_app(app)
+    migrate.init_app(app, db)
     JWTManager(app)
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
