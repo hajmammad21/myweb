@@ -60,7 +60,7 @@ const AdminProductReview = () => {
               <p>{p.description}</p>
               <div className="product-price">قیمت: {p.price} تومان</div>
               <a 
-                href={p.file_url} 
+                href={`http://localhost:5000${p.file_url}`}
                 target="_blank" 
                 rel="noreferrer"
                 className="product-file-link"
