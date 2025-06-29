@@ -113,21 +113,21 @@ const TeacherDashboard = () => {
   };
 
   const markAsRead = (id) => {
-    fetchWithAuth(`http://localhost:5000/api/users/notifications/${id}/read`, {
-      method: 'PUT',
+  fetchWithAuth(`http://localhost:5000/api/users/notifications/${id}/read`, {
+    method: 'PUT',
+  })
+    .then((res) => res.json())
+    .then(() => {
+      setNotifications((prev) =>
+        prev.filter((n) => n.id !== id)
+      );
+      addToast('اعلان به عنوان خوانده شده علامت‌گذاری شد', 'success');
     })
-      .then((res) => res.json())
-      .then(() => {
-        setNotifications((prev) => 
-          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-        );
-        addToast('اعلان به عنوان خوانده شده علامت‌گذاری شد', 'success');
-      })
-      .catch((err) => {
-        console.error('Error marking as read:', err);
-        addToast('خطا در علامت‌گذاری اعلان', 'error');
-      });
-  };
+    .catch((err) => {
+      console.error('Error marking notification as read:', err);
+      addToast('خطا در علامت‌گذاری اعلان', 'error');
+    });
+};
 
   return (
     <>

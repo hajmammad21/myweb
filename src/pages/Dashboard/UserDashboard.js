@@ -3,7 +3,6 @@ import './UserDashboard.css';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
 import toast from 'react-hot-toast';
 
-// Enhanced Mark as Read Button Component
 const MarkAsReadButton = ({ notificationId, onMarkAsRead, isRead = false }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -70,7 +69,7 @@ const UserDashboard = () => {
         setNotifications(data);
       } else {
         console.warn("Unexpected notifications response:", data);
-        setNotifications([]); // Prevent .map() crash
+        setNotifications([]);
       }
 
       setLoading(false);
@@ -81,25 +80,22 @@ const UserDashboard = () => {
     });
 }, []);
 
-  // Enhanced markAsRead function with error handling
-  const markAsRead = async (id) => {
-    try {
-      const response = await fetchWithAuth(`http://localhost:5000/api/users/notifications/${id}/read`, {
-        method: 'PUT',
-      });
-      
-      if (response.ok) {
-        setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-        );
-      } else {
-        throw new Error('Failed to mark as read');
-      }
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      // You can add error handling here, like showing a toast notification
-    }
-  };
+  const markAsRead = (id) => {
+  fetchWithAuth(`http://localhost:5000/api/users/notifications/${id}/read`, {
+    method: 'PUT',
+  })
+    .then((res) => res.json())
+    .then(() => {
+      setNotifications((prev) =>
+        prev.filter((n) => n.id !== id)
+      );
+      toast.success('اعلان به عنوان خوانده شده علامت‌گذاری شد', 'success');
+    })
+    .catch((err) => {
+      toast.error('Error marking notification as read:', err);
+      toast.error('خطا در علامت‌گذاری اعلان', 'error');
+    });
+};
 
   const handlePasswordChange = (e) => {
     e.preventDefault();
