@@ -11,7 +11,6 @@ const Header = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // Check for user authentication on component mount and localStorage changes
   useEffect(() => {
     const checkUserAuth = () => {
       const userData = localStorage.getItem('user');
@@ -29,10 +28,8 @@ const Header = () => {
       }
     };
 
-    // Initial check
     checkUserAuth();
 
-    // Listen for storage changes (when user logs in/out in another tab)
     const handleStorageChange = (e) => {
       if (e.key === 'user') {
         checkUserAuth();
@@ -41,7 +38,6 @@ const Header = () => {
 
     window.addEventListener('storage', handleStorageChange);
 
-    // Also listen for custom events (when user logs in/out in same tab)
     const handleAuthChange = () => {
       checkUserAuth();
     };
@@ -89,7 +85,6 @@ const Header = () => {
     setIsTestsDropdownOpen(false);
     setIsLearningDropdownOpen(false);
     
-    // Navigate to different pages based on the dropdown item
     if (item === 'تست های دروس') {
       navigate('/test-page');
     } else if (item === 'آزمون های سال های گذشته') {
@@ -97,9 +92,9 @@ const Header = () => {
     } else if (item === 'آزمون های آزمایشی') {
       navigate('/mock-exams');
     } else if (item === 'تدریسی ها و پی دی اف کتب') {
-      navigate('/lessons-pdfs'); // Add this navigation to LessonsPdfs page
+      navigate('/lessons-pdfs');
     } else if (item === 'جزوات جمع بندی') {
-      navigate('/summary-notes'); // Add this for future summary notes page
+      navigate('/summary-notes');
     } else {
       console.log(`Navigating to: ${item}`);
     }
@@ -110,23 +105,15 @@ const Header = () => {
     setIsUserDropdownOpen(false);
   };
 
-  const handleProfile = () => {
-    navigate('/profile');
-    setIsUserDropdownOpen(false);
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('user');
     setUser(null);
     setIsUserDropdownOpen(false);
     
-    // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('authChange'));
     
-    // Navigate to home page
     navigate('/');
     
-    // Show logout confirmation
     toast.success('با موفقیت خارج شدید');
   };
 
@@ -134,7 +121,6 @@ const Header = () => {
     navigate('/auth');
   };
 
-  // Get user's first name for display
   const getUserDisplayName = () => {
     if (!user || !user.name) return 'کاربر';
     return user.name.split(' ')[0];
@@ -286,7 +272,6 @@ const Header = () => {
 
         <div className="auth-section">
           {user ? (
-            // User is logged in - show user dropdown
             <div
               className="nav-item dropdown-container user-dropdown"
               onMouseEnter={() => handleUserHover(true)}
@@ -309,16 +294,6 @@ const Header = () => {
                   🏠 داشبورد
                 </a>
                 <a
-                  href="#profile"
-                  className="dropdown-item"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleProfile();
-                  }}
-                >
-                  👤 پروفایل من
-                </a>
-                <a
                   href="#logout"
                   className="dropdown-item logout-item"
                   onClick={(e) => {
@@ -331,7 +306,6 @@ const Header = () => {
               </div>
             </div>
           ) : (
-            // User is not logged in - show login/signup button
             <button
               className="auth-btn"
               onClick={handleAuthClick}
