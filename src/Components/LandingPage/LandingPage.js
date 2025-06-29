@@ -1,4 +1,3 @@
-// src/Components/LandingPage/LandingPage.js
 import React from 'react';
 import './LandingPage.css';
 import Hero from './Hero/Hero';

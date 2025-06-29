@@ -112,7 +112,7 @@ def mark_notification_as_read(id):
     if not notification:
         return jsonify({"msg": "Notification not found."}), 404
 
-    notification.is_read = True
+    db.session.delete(notification)
     db.session.commit()
 
     return jsonify({"msg": "Notification marked as read."}), 200

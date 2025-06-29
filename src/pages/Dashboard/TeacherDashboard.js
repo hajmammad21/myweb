@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../Components/Auth/Auth';
+import toast from 'react-hot-toast';
 import './TeacherDashboard.css';
 
 const Toast = ({ message, type, onClose }) => {
@@ -118,14 +119,12 @@ const TeacherDashboard = () => {
   })
     .then((res) => res.json())
     .then(() => {
-      setNotifications((prev) =>
-        prev.filter((n) => n.id !== id)
-      );
-      addToast('اعلان به عنوان خوانده شده علامت‌گذاری شد', 'success');
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      toast.success('اعلان به عنوان خوانده شده علامت‌گذاری شد', 'success');
     })
     .catch((err) => {
-      console.error('Error marking notification as read:', err);
-      addToast('خطا در علامت‌گذاری اعلان', 'error');
+      toast.error('Error marking notification as read:', err);
+      toast.error('خطا در علامت‌گذاری اعلان', 'error');
     });
 };
 

@@ -81,14 +81,12 @@ const UserDashboard = () => {
 }, []);
 
   const markAsRead = (id) => {
-  fetchWithAuth(`http://localhost:5000/api/users/notifications/${id}/read`, {
+    fetchWithAuth(`http://localhost:5000/api/users/notifications/${id}/read`, {
     method: 'PUT',
   })
     .then((res) => res.json())
     .then(() => {
-      setNotifications((prev) =>
-        prev.filter((n) => n.id !== id)
-      );
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
       toast.success('اعلان به عنوان خوانده شده علامت‌گذاری شد', 'success');
     })
     .catch((err) => {
